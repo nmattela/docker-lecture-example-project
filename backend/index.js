@@ -1,32 +1,40 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const { MongoClient } = require('mongodb')
-const mongoose = require('mongoose')
+const { Client } = require('pg')
+const cors = require('cors')
+const client = new Client({
+    host: 'db',
+    port: 5432,
+    user: 'list',
+    password: 'list',
+})
 
 
 const port = 4000
 const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.raw({ inflate: true, limit: '100kb', type: 'text/plain' }))
+app.use(cors())
 
-const listItemSchema = new mongoose.Schema({
-    name: { type: String, required: true }
-})
-const ListItem = mongoose.model('ListItem', listItemSchema)
+const main = async () => {
+    await client.connect()
 
-app.get('/', async (req, res) => {
-    res.send(await ListItem.find())
-})
-app.post('/',  async (req, res) => {
-    const listItem = new ListItem({ name: req.body })
-    await listItem.save()
-    res.send('OK')
-})
-app.delete('/', (req, res) => {
-    ListItem.findOneAndDelete({ name: req.body })
-    res.send('OK')
-})
+    const getAll = async () => (await client.query('SELECT * FROM list_items')).rows
 
-mongoose.connect('mongodb://list:list@mongo:27017/list')
-mongoose.connection.once('open', () => console.log('MongoDB ready'))
-app.listen(port, () => console.log('Express ready'))
+    app.get('/', async (req, res) => {
+        res.send(await getAll())
+    })
+    app.post('/',  async (req, res) => {
+        await client.query('INSERT INTO list_items (name) VALUES ($1::text)', [req.body])
+        res.send(await getAll())
+    })
+    app.delete('/', async (req, res) => {
+        await client.query('DELETE FROM list_items WHERE name = $1', [req.body])
+        res.send(await getAll())
+    })
+    
+    
+    app.listen(port, () => console.log('Express ready'))
+}
+
+main()
