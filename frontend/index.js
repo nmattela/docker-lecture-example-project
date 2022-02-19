@@ -3,13 +3,13 @@ async function submitNewItem(event) {
 
     const new_item = document.getElementById('new_item')
 
-    const values = await (await fetch("http://backend:4000/", { method: 'POST', body: new_item.value, })).json()
+    const values = await (await fetch("http://localhost:4000/", { method: 'POST', body: new_item.value, })).json()
 
     populateList(values)
 }
 
 async function getItems() {
-    return (await (await fetch("http://backend:4000/")).json())
+    return (await (await fetch("http://localhost:4000/")).json())
 }
 
 function populateList(items) {
