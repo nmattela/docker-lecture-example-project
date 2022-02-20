@@ -1,5 +1,4 @@
 async function submitNewItem(event) {
-    //event.preventDefault()
 
     const new_item = document.getElementById('new_item')
 

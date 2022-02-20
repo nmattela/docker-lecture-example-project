@@ -10,14 +10,13 @@ services:
     ports:
       - "4000:4000"
   db:
-    image: postgres
+    build: database
     restart: always
     environment:
       POSTGRES_PASSWORD: list
       POSTGRES_USER: list
       POSTGRES_DB: list
     volumes:
-      - database:/data/initdb
-      - ./database/initdb:/docker-entrypoint-initdb.d
+      - database:/var/lib/postgresql/data
 volumes:
   database:
