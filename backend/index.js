@@ -12,9 +12,9 @@ const client = new Client({
 
 const port = 4000
 const app = express()
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.raw({ inflate: true, limit: '100kb', type: 'text/plain' }))
-app.use(cors())
 
 const main = async () => {
     await client.connect()

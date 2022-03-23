@@ -18,7 +18,23 @@ function populateList(items) {
         list.removeChild(list.firstChild);
     }
 
-    items.forEach((item) => document.appendChild(`<li>${item}</li>`))
+    items.forEach((item) => {
+        console.log(item)
+        const newChild = document.createElement('li');
+        const text = document.createElement('p')
+        text.innerText = item.name
+        const button = document.createElement('button')
+        button.innerText = "delete"
+        button.setAttribute("onclick", `remove("${item.name}")`)
+        newChild.appendChild(text)
+        newChild.appendChild(button)
+        list.appendChild(newChild)
+    })
+}
+
+async function remove(name) {
+    const values = await (await fetch("http://localhost:4000/", { method: 'DELETE', body: name, })).json()
+    populateList(values)
 }
 
 async function main() {
